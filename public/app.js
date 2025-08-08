@@ -1,54 +1,80 @@
-// Questions (modifie librement)
-const QUESTIONS = [
-  "Présentez-vous en quelques lignes.",
-  "Pourquoi souhaitez-vous ce poste ?",
-  "Décrivez une situation où vous avez résolu un problème complexe.",
-  "Comment gérez-vous la pression et les délais ?",
-  "Parlez d’un échec et de ce que vous avez appris.",
-  "Quelles compétences clés apportez-vous à l’équipe ?",
-  "Expliquez un projet dont vous êtes fier/fière.",
-  "Comment vous organisez-vous au quotidien ?",
-  "Qu’attendez-vous de votre manager ?",
-  "Votre disponibilité et vos prétentions ?"
-];
+// ===== i18n =====
+const L = LANGS[getLang()]; // défini dans lang.js
 
+// ===== Sélecteurs communs =====
+const $ = (s) => document.querySelector(s);
+
+// Récup token depuis l'URL
 const url = new URL(location.href);
 const token = (url.searchParams.get("token") || "").trim();
-document.getElementById("idToken").textContent = token ? `ID: ${token}` : "ID non fourni";
 
-const qTitle = document.getElementById("qTitle");
-const textArea = document.getElementById("textAnswer");
-const chars = document.getElementById("chars");
-const recBtn = document.getElementById("recBtn");
-const stopBtn = document.getElementById("stopBtn");
-const aStatus = document.getElementById("aStatus");
-const player = document.getElementById("player");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-const stepLabel = document.getElementById("stepLabel");
-const progressBar = document.getElementById("progressBar");
-const statusEl = document.getElementById("status");
-const timerEl = document.getElementById("timer");
+// Références DOM (voir test.html)
+const idTok      = $("#idToken");
+const qTitle     = $("#qTitle");
+const textArea   = $("#textAnswer");
+const chars      = $("#chars");
+const recBtn     = $("#recBtn");
+const stopBtn    = $("#stopBtn");
+const aStatus    = $("#aStatus");
+const player     = $("#player");
+const prevBtn    = $("#prevBtn");
+const nextBtn    = $("#nextBtn");
+const stepLabel  = $("#stepLabel");
+const progressBar= $("#progressBar");
+const statusEl   = $("#status");
+const timerEl    = $("#timer");
+const audioLabel = $("#audioLabel");
 
-// État
-let i = 0;
-const textAnswers = Array(QUESTIONS.length).fill("");
-const audioBlobs  = Array(QUESTIONS.length).fill(null);
+// ===== Paramètres =====
+const QUESTIONS = L.questions;
+const N = QUESTIONS.length;
+const MAX_CHARS = 600;   // <<< limite max
+const MIN_CHARS = 20;    // <<< limite min conseillée (mettre 0 pour désactiver)
 
-// Timer total
+// ===== Init textes statiques (langue) =====
+document.title = `${L.step_prefix} 1 / ${N}`;
+$("header span.font-semibold").textContent = L.brand;
+$("#lnkConf").textContent = L.conf;
+$("footer a").textContent = L.footer;
+audioLabel.textContent = L.audio_label;
+recBtn.textContent = L.record;
+stopBtn.textContent = L.stop;
+prevBtn.textContent = L.prev;
+
+// Afficher ID candidat
+if (idTok) idTok.textContent = L.id_shown(token);
+
+// Fond dégradé (si jamais pas déjà fait par la page)
+document.body.classList.add("bg-gradient-to-br", "from-slate-50", "to-indigo-50");
+
+// ===== Etat =====
+let i = 0; // index question courante
+const textAnswers = Array(N).fill("");
+const audioBlobs  = Array(N).fill(null);
+
+// ===== Timer global =====
 const t0 = Date.now();
 setInterval(() => {
-  const s = Math.floor((Date.now() - t0)/1000);
-  const m = Math.floor(s/60);
+  const s = Math.floor((Date.now() - t0) / 1000);
+  const m = Math.floor(s / 60);
   const r = s % 60;
-  timerEl.textContent = `Temps écoulé ${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+  timerEl.textContent = `${L.time_prefix} ${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
 }, 1000);
 
-// UI
-function loadQuestion(idx){
-  qTitle.textContent = `Q${idx+1}. ${QUESTIONS[idx]}`;
+// ===== Helpers =====
+function plural(n, s, p) { return n > 1 ? p : s; }
+function countStr(n) { return `${n} ${plural(n, "caractère", "caractères")}`; }
+
+// ===== Chargement d'une question =====
+textArea.setAttribute("maxlength", MAX_CHARS);
+
+function loadQuestion(idx) {
+  qTitle.textContent = `${L.step_prefix} ${idx + 1}. ${QUESTIONS[idx]}`;
   textArea.value = textAnswers[idx] || "";
-  chars.textContent = `${textArea.value.length} caractère${textArea.value.length>1?'s':''}`;
+  const n = textArea.value.length;
+  chars.textContent = `${countStr(n)} / ${MAX_CHARS}${MIN_CHARS ? ` (min ${MIN_CHARS})` : ""}`;
+
+  // Audio
   player.classList.add("hidden");
   if (audioBlobs[idx]) {
     player.src = URL.createObjectURL(audioBlobs[idx]);
@@ -58,63 +84,105 @@ function loadQuestion(idx){
     player.removeAttribute("src");
     aStatus.textContent = "Aucun audio";
   }
+
+  // Boutons / barre
   prevBtn.disabled = (idx === 0);
-  nextBtn.textContent = (idx === QUESTIONS.length-1) ? "Soumettre ✅" : "Suivant →";
-  stepLabel.textContent = `Question ${idx+1} / ${QUESTIONS.length}`;
-  progressBar.style.width = `${((idx+1)/QUESTIONS.length)*100}%`;
+  nextBtn.textContent = (idx === N - 1) ? L.submit : L.next;
+  stepLabel.textContent = `${L.step_prefix} ${idx + 1} / ${N}`;
+  progressBar.style.width = `${((idx + 1) / N) * 100}%`;
+
+  // Titre du document
+  document.title = `${L.step_prefix} ${idx + 1} / ${N}`;
 }
+
+// Premier affichage
 loadQuestion(i);
 
+// ===== Écouteurs =====
+// Saisie texte + compteur
 textArea.addEventListener("input", () => {
   textAnswers[i] = textArea.value;
-  chars.textContent = `${textArea.value.length} caractère${textArea.value.length>1?'s':''}`;
+  const n = textArea.value.length;
+  chars.textContent = `${countStr(n)} / ${MAX_CHARS}${MIN_CHARS ? ` (min ${MIN_CHARS})` : ""}`;
 });
 
-prevBtn.addEventListener("click", () => { if (i>0){ i--; loadQuestion(i);} });
+// Navigation
+prevBtn.addEventListener("click", () => {
+  if (i > 0) { i--; loadQuestion(i); }
+});
 
 nextBtn.addEventListener("click", async () => {
-  if (i < QUESTIONS.length-1){ i++; loadQuestion(i); return; }
+  // Vérifie minimum de caractères (optionnel)
+  if (MIN_CHARS && textArea.value.length < MIN_CHARS) {
+    alert(`Merci d'écrire au moins ${MIN_CHARS} caractères.`);
+    return;
+  }
+
+  // Encore des questions → on avance
+  if (i < N - 1) {
+    i++;
+    loadQuestion(i);
+    return;
+  }
+
   // Soumission finale
-  statusEl.textContent = "Envoi en cours…";
+  statusEl.textContent = L.sending;
   try {
     const fd = new FormData();
     fd.append("token", token);
     fd.append("answers", JSON.stringify(textAnswers));
-    audioBlobs.forEach((b, k) => { if (b) fd.append(`audio${k}`, b, `q${k+1}.webm`); });
+    audioBlobs.forEach((b, k) => { if (b) fd.append(`audio${k}`, b, `q${k + 1}.webm`); });
+
     const res = await fetch("/api/submit", { method: "POST", body: fd });
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || "Erreur serveur");
-    statusEl.textContent = "✅ Réponses envoyées. Merci !";
-    nextBtn.disabled = true; prevBtn.disabled = true; recBtn.disabled = true; stopBtn.disabled = true; textArea.disabled = true;
+    if (!data.ok) throw new Error(data.error || "Server error");
+
+    statusEl.textContent = L.sent;
+    nextBtn.disabled = true;
+    prevBtn.disabled = true;
+    recBtn.disabled = true;
+    stopBtn.disabled = true;
+    textArea.disabled = true;
   } catch (e) {
-    statusEl.textContent = "❌ Échec de l’envoi : " + e.message;
+    statusEl.textContent = `${L.send_fail} ${e.message}`;
   }
 });
 
-// Audio
-let stream=null, mr=null, chunks=[];
-async function ensureStream(){ if(!stream) stream = await navigator.mediaDevices.getUserMedia({audio:true}); return stream; }
+// ===== Enregistrement audio =====
+let stream = null, mr = null, chunks = [];
 
-recBtn.addEventListener("click", async ()=>{
+async function ensureStream() {
+  if (!stream) {
+    // Demande micro
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  }
+  return stream;
+}
+
+recBtn.addEventListener("click", async () => {
   await ensureStream();
   if (mr && mr.state !== "inactive") mr.stop();
+
   chunks = [];
   mr = new MediaRecorder(stream, { mimeType: "audio/webm" });
-  mr.ondataavailable = e => chunks.push(e.data);
-  mr.onstop = ()=>{
+  mr.ondataavailable = (e) => chunks.push(e.data);
+  mr.onstop = () => {
     const blob = new Blob(chunks, { type: "audio/webm" });
     audioBlobs[i] = blob;
     player.src = URL.createObjectURL(blob);
     player.classList.remove("hidden");
     aStatus.textContent = "Audio enregistré ✔";
   };
+
   mr.start();
-  recBtn.disabled = true; stopBtn.disabled = false;
+  recBtn.disabled = true;
+  stopBtn.disabled = false;
   aStatus.textContent = "Enregistrement en cours…";
 });
 
-stopBtn.addEventListener("click", ()=>{
+stopBtn.addEventListener("click", () => {
   if (mr && mr.state !== "inactive") mr.stop();
-  recBtn.disabled = false; stopBtn.disabled = true;
+  recBtn.disabled = false;
+  stopBtn.disabled = true;
   aStatus.textContent = "Traitement de l’audio…";
 });
