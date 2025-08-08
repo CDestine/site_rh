@@ -1,8 +1,8 @@
-// 10 questions (modifie-les au besoin)
+// Questions (modifie librement)
 const QUESTIONS = [
   "Présentez-vous en quelques lignes.",
   "Pourquoi souhaitez-vous ce poste ?",
-  "Citez une situation où vous avez résolu un problème complexe.",
+  "Décrivez une situation où vous avez résolu un problème complexe.",
   "Comment gérez-vous la pression et les délais ?",
   "Parlez d’un échec et de ce que vous avez appris.",
   "Quelles compétences clés apportez-vous à l’équipe ?",
@@ -12,106 +12,109 @@ const QUESTIONS = [
   "Votre disponibilité et vos prétentions ?"
 ];
 
-const url = new URL(window.location.href);
+const url = new URL(location.href);
 const token = (url.searchParams.get("token") || "").trim();
+document.getElementById("idToken").textContent = token ? `ID: ${token}` : "ID non fourni";
 
-const meta = document.getElementById("meta");
-meta.innerHTML = `<div class="badge">Identifiant: <b>${token || "(non fourni)"}<\/b></div>`;
-
-const wrap = document.getElementById("qwrap");
+const qTitle = document.getElementById("qTitle");
+const textArea = document.getElementById("textAnswer");
+const chars = document.getElementById("chars");
+const recBtn = document.getElementById("recBtn");
+const stopBtn = document.getElementById("stopBtn");
+const aStatus = document.getElementById("aStatus");
+const player = document.getElementById("player");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const stepLabel = document.getElementById("stepLabel");
+const progressBar = document.getElementById("progressBar");
+const statusEl = document.getElementById("status");
+const timerEl = document.getElementById("timer");
 
 // État
+let i = 0;
 const textAnswers = Array(QUESTIONS.length).fill("");
-const audioBlobs = Array(QUESTIONS.length).fill(null);
+const audioBlobs  = Array(QUESTIONS.length).fill(null);
 
-// Créer questions
-QUESTIONS.forEach((q, idx) => {
-  const div = document.createElement("div");
-  div.className = "q";
-  div.innerHTML = `
-    <h3>Q${idx + 1}. ${q}</h3>
-    <label>Réponse écrite</label>
-    <textarea data-idx="${idx}" placeholder="Votre réponse ici..."></textarea>
-    <div class="row">
-      <button class="rec" data-idx="${idx}">🎙️ Enregistrer</button>
-      <button class="stop" data-idx="${idx}" disabled>⏹ Arrêter</button>
-      <span class="audio-status" id="astatus-${idx}">Aucun audio</span>
-    </div>
-    <audio id="ap-${idx}" controls style="display:none;"></audio>
-  `;
-  wrap.appendChild(div);
-});
+// Timer total
+const t0 = Date.now();
+setInterval(() => {
+  const s = Math.floor((Date.now() - t0)/1000);
+  const m = Math.floor(s/60);
+  const r = s % 60;
+  timerEl.textContent = `Temps écoulé ${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+}, 1000);
 
-// Texte
-wrap.addEventListener("input", (e) => {
-  if (e.target.tagName === "TEXTAREA") {
-    const i = parseInt(e.target.getAttribute("data-idx"));
-    textAnswers[i] = e.target.value;
+// UI
+function loadQuestion(idx){
+  qTitle.textContent = `Q${idx+1}. ${QUESTIONS[idx]}`;
+  textArea.value = textAnswers[idx] || "";
+  chars.textContent = `${textArea.value.length} caractère${textArea.value.length>1?'s':''}`;
+  player.classList.add("hidden");
+  if (audioBlobs[idx]) {
+    player.src = URL.createObjectURL(audioBlobs[idx]);
+    player.classList.remove("hidden");
+    aStatus.textContent = "Audio enregistré ✔";
+  } else {
+    player.removeAttribute("src");
+    aStatus.textContent = "Aucun audio";
   }
-});
-
-// Audio avec MediaRecorder
-let stream = null, mediaRecorder = null, currentIdx = null, chunks = [];
-
-async function ensureStream() {
-  if (!stream) stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  return stream;
+  prevBtn.disabled = (idx === 0);
+  nextBtn.textContent = (idx === QUESTIONS.length-1) ? "Soumettre ✅" : "Suivant →";
+  stepLabel.textContent = `Question ${idx+1} / ${QUESTIONS.length}`;
+  progressBar.style.width = `${((idx+1)/QUESTIONS.length)*100}%`;
 }
+loadQuestion(i);
 
-wrap.addEventListener("click", async (e) => {
-  if (e.target.classList.contains("rec")) {
-    const idx = parseInt(e.target.getAttribute("data-idx"));
-    await ensureStream();
-    if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
-
-    currentIdx = idx;
-    chunks = [];
-    mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-    mediaRecorder.ondataavailable = ev => chunks.push(ev.data);
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "audio/webm" });
-      audioBlobs[currentIdx] = blob;
-      const audioEl = document.getElementById("ap-" + currentIdx);
-      audioEl.src = URL.createObjectURL(blob);
-      audioEl.style.display = "block";
-      document.getElementById("astatus-" + currentIdx).textContent = "Audio enregistré ✔";
-    };
-    mediaRecorder.start();
-    e.target.disabled = true;
-    e.target.nextElementSibling.disabled = false;
-    document.getElementById("astatus-" + idx).textContent = "Enregistrement en cours...";
-  }
-  if (e.target.classList.contains("stop")) {
-    const idx = parseInt(e.target.getAttribute("data-idx"));
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-      e.target.disabled = true;
-      e.target.previousElementSibling.disabled = false;
-      document.getElementById("astatus-" + idx).textContent = "Traitement de l'audio...";
-    }
-  }
+textArea.addEventListener("input", () => {
+  textAnswers[i] = textArea.value;
+  chars.textContent = `${textArea.value.length} caractère${textArea.value.length>1?'s':''}`;
 });
 
-// Soumission
-document.getElementById("submitBtn").addEventListener("click", async () => {
-  const status = document.getElementById("status");
-  status.textContent = "Envoi en cours...";
+prevBtn.addEventListener("click", () => { if (i>0){ i--; loadQuestion(i);} });
 
+nextBtn.addEventListener("click", async () => {
+  if (i < QUESTIONS.length-1){ i++; loadQuestion(i); return; }
+  // Soumission finale
+  statusEl.textContent = "Envoi en cours…";
   try {
     const fd = new FormData();
     fd.append("token", token);
     fd.append("answers", JSON.stringify(textAnswers));
-
-    audioBlobs.forEach((blob, i) => {
-      if (blob) fd.append(`audio${i}`, blob, `q${i+1}.webm`);
-    });
-
+    audioBlobs.forEach((b, k) => { if (b) fd.append(`audio${k}`, b, `q${k+1}.webm`); });
     const res = await fetch("/api/submit", { method: "POST", body: fd });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || "Erreur serveur");
-    status.textContent = "✅ Réponses envoyées. Merci !";
-  } catch (err) {
-    console.error(err);
-    status.textContent = "❌ Échec de l’envoi : " + err.message;
+    statusEl.textContent = "✅ Réponses envoyées. Merci !";
+    nextBtn.disabled = true; prevBtn.disabled = true; recBtn.disabled = true; stopBtn.disabled = true; textArea.disabled = true;
+  } catch (e) {
+    statusEl.textContent = "❌ Échec de l’envoi : " + e.message;
   }
+});
+
+// Audio
+let stream=null, mr=null, chunks=[];
+async function ensureStream(){ if(!stream) stream = await navigator.mediaDevices.getUserMedia({audio:true}); return stream; }
+
+recBtn.addEventListener("click", async ()=>{
+  await ensureStream();
+  if (mr && mr.state !== "inactive") mr.stop();
+  chunks = [];
+  mr = new MediaRecorder(stream, { mimeType: "audio/webm" });
+  mr.ondataavailable = e => chunks.push(e.data);
+  mr.onstop = ()=>{
+    const blob = new Blob(chunks, { type: "audio/webm" });
+    audioBlobs[i] = blob;
+    player.src = URL.createObjectURL(blob);
+    player.classList.remove("hidden");
+    aStatus.textContent = "Audio enregistré ✔";
+  };
+  mr.start();
+  recBtn.disabled = true; stopBtn.disabled = false;
+  aStatus.textContent = "Enregistrement en cours…";
+});
+
+stopBtn.addEventListener("click", ()=>{
+  if (mr && mr.state !== "inactive") mr.stop();
+  recBtn.disabled = false; stopBtn.disabled = true;
+  aStatus.textContent = "Traitement de l’audio…";
 });
