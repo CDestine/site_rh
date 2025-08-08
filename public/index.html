@@ -1,28 +1,60 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Pré-sélection RH</title>
-  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="data:,">
 </head>
-<body>
-  <main class="card">
-    <h1>Pré-sélection RH</h1>
-    <p>Bienvenue ! Ce test comporte 10 questions. Chaque question attend une réponse <b>écrite</b> et (optionnel) un <b>enregistrement audio</b>.</p>
-    <p>Prévoyez 10–15 minutes. Vos réponses seront utilisées pour la pré-sélection.</p>
+<body class="bg-slate-50 text-slate-800">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600"></div>
+        <span class="font-semibold">Acme • Recrutement</span>
+      </div>
+      <nav class="text-sm text-slate-600">
+        <a href="privacy.html" class="hover:text-slate-900">Confidentialité</a>
+      </nav>
+    </div>
+  </header>
 
-    <form action="test.html" method="get">
-      <label for="token">Votre identifiant (pré-rempli via QR code si fourni)</label>
-      <input id="token" name="token" placeholder="ex: CAND-1234" />
-      <button type="submit">Commencer</button>
-    </form>
+  <!-- Hero -->
+  <main class="max-w-3xl mx-auto px-4 py-10">
+    <div class="bg-white shadow-sm ring-1 ring-black/5 rounded-2xl p-8">
+      <h1 class="text-2xl font-bold mb-2">Pré-sélection des candidats</h1>
+      <p class="text-slate-600 mb-6">
+        Ce test comporte <b>10 questions</b>. Chaque question accepte une réponse <b>écrite</b> et
+        (optionnel) un <b>enregistrement audio</b>. Durée estimée : 10–15&nbsp;minutes.
+      </p>
+
+      <form action="test.html" method="get" class="space-y-4">
+        <label class="block">
+          <span class="text-sm font-medium">Identifiant candidat (depuis QR code)</span>
+          <input id="token" name="token" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="ex: CAND-1234">
+        </label>
+        <button class="w-full md:w-auto inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2 font-medium">
+          Commencer le test
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.25 8.25L21 12l-3.75 3.75M3 12h18"/></svg>
+        </button>
+      </form>
+
+      <p class="text-xs text-slate-500 mt-4">Vos réponses sont utilisées uniquement dans le cadre de ce recrutement.</p>
+    </div>
   </main>
 
+  <!-- Footer -->
+  <footer class="py-8 text-center text-xs text-slate-500">
+    © 2025 Acme. <a href="privacy.html" class="underline">Politique de confidentialité</a>
+  </footer>
+
+  <!-- Cookie banner -->
+  <script src="cookies.js"></script>
   <script>
-    // Si le QR code inclut ?token=..., préremplir
-    const url = new URL(window.location.href);
-    const t = url.searchParams.get("token");
+    // Pré-remplir token si ?token=...
+    const u = new URL(location.href); const t = u.searchParams.get("token");
     if (t) document.getElementById("token").value = t;
   </script>
 </body>
