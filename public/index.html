@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pré-sélection RH</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="card">
+    <h1>Pré-sélection RH</h1>
+    <p>Bienvenue ! Ce test comporte 10 questions. Chaque question attend une réponse <b>écrite</b> et (optionnel) un <b>enregistrement audio</b>.</p>
+    <p>Prévoyez 10–15 minutes. Vos réponses seront utilisées pour la pré-sélection.</p>
+
+    <form action="test.html" method="get">
+      <label for="token">Votre identifiant (pré-rempli via QR code si fourni)</label>
+      <input id="token" name="token" placeholder="ex: CAND-1234" />
+      <button type="submit">Commencer</button>
+    </form>
+  </main>
+
+  <script>
+    // Si le QR code inclut ?token=..., préremplir
+    const url = new URL(window.location.href);
+    const t = url.searchParams.get("token");
+    if (t) document.getElementById("token").value = t;
+  </script>
+</body>
+</html>
