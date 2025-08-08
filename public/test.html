@@ -1,67 +1,86 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Test</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css">
+  <style>
+    body { min-height: 100dvh; background: radial-gradient(1200px 600px at 20% -10%, #eef2ff 0, transparent 60%),
+                                  radial-gradient(1000px 500px at 120% 10%, #f0f9ff 0, transparent 50%), #f8fafc; }
+    .shell { max-width: 840px; margin: 2.5rem auto; }
+    .muted { color: #64748b; }
+    .progress { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .progress > div { height: 100%; width: 10%; background: #2563eb; }
+    .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-indigo-50">
+<body>
+  <header class="container">
+    <nav>
+      <ul><li><strong id="brand">Acme • Recrutement</strong></li></ul>
+      <ul>
+        <li><a href="privacy.html" id="lnkConf">Confidentialité</a></li>
+        <li>
+          <select id="langSel">
+            <option value="fr">FR</option>
+            <option value="en">EN</option>
+          </select>
+        </li>
+      </ul>
+    </nav>
+  </header>
 
-<header class="flex justify-between items-center p-4 bg-white shadow">
-  <span class="font-semibold">Acme • Recrutement</span>
-  <div class="flex items-center gap-4">
-    <a href="privacy.html" id="lnkConf" class="text-sm text-slate-600 hover:text-slate-900">Confidentialité</a>
-    <select id="langSel" class="text-sm border border-slate-300 rounded-lg px-2 py-1">
-      <option value="fr">FR</option>
-      <option value="en">EN</option>
-    </select>
-  </div>
-</header>
+  <main class="container shell">
+    <article class="card">
+      <header class="row" style="justify-content:space-between">
+        <small id="idToken" class="muted"></small>
+        <small class="muted"><span id="timer">00:00</span></small>
+      </header>
 
-<main class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow mt-6">
-  <div class="mb-4 text-sm text-slate-500" id="idToken"></div>
-  <h2 class="text-lg font-bold mb-4" id="qTitle">Question</h2>
-  <textarea id="textAnswer" class="border rounded w-full p-2 mb-2" rows="4"></textarea>
-  <div class="text-sm text-slate-500 mb-4" id="chars">0 / 600</div>
+      <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+      <small id="stepLabel" class="muted">Question 1 / 10</small>
 
-  <div class="mb-4">
-    <div class="text-sm font-medium mb-1" id="audioLabel">Réponse audio (optionnelle)</div>
-    <button id="recBtn" class="bg-green-600 text-white px-3 py-1 rounded mr-2">🎙️ Enregistrer</button>
-    <button id="stopBtn" class="bg-red-600 text-white px-3 py-1 rounded" disabled>⏹ Arrêter</button>
-    <div id="aStatus" class="text-xs text-slate-500 mt-1"></div>
-    <audio id="player" controls class="hidden mt-2 w-full"></audio>
-  </div>
+      <h2 id="qTitle" style="margin-top:.5rem">Question</h2>
 
-  <div class="flex justify-between items-center mt-6">
-    <button id="prevBtn" class="bg-slate-500 text-white px-4 py-2 rounded" disabled>← Précédent</button>
-    <button id="nextBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Suivant →</button>
-  </div>
+      <label id="lblWritten">Réponse écrite</label>
+      <textarea id="textAnswer" rows="6" placeholder="Votre réponse ici..." maxlength="600"></textarea>
+      <small id="chars" class="muted">0 / 600 (min 20)</small>
 
-  <div class="mt-4 text-sm text-slate-500 flex justify-between items-center">
-    <span id="stepLabel">Question 1 / 10</span>
-    <span id="timer">Temps écoulé 00:00</span>
-  </div>
-  <div class="w-full bg-slate-200 rounded-full h-2 mt-2">
-    <div id="progressBar" class="bg-blue-600 h-2 rounded-full" style="width: 10%"></div>
-  </div>
+      <label id="audioLabel">Réponse audio (optionnelle)</label>
+      <div class="row">
+        <button id="recBtn" class="secondary">🎙️ Enregistrer</button>
+        <button id="stopBtn" class="secondary" disabled>⏹ Arrêter</button>
+        <small id="aStatus" class="muted">Aucun audio</small>
+      </div>
+      <audio id="player" controls style="display:none;width:100%"></audio>
 
-  <div id="status" class="mt-4 text-sm"></div>
-</main>
+      <footer class="row" style="justify-content:space-between">
+        <button id="prevBtn" class="secondary" disabled>← Précédent</button>
+        <button id="nextBtn">Suivant →</button>
+      </footer>
 
-<footer class="text-center mt-8 p-4 text-sm text-slate-500">
-  <a href="privacy.html">Politique de confidentialité</a>
-</footer>
+      <small id="status" class="muted"></small>
+    </article>
 
-<!-- Scripts -->
-<script src="lang.js"></script>
-<script src="cookies.js"></script>
-<script src="app.js"></script>
-<script>
-  // Initialisation langue sur test.html
-  const lang = getLang();
-  document.getElementById("langSel").value = lang;
-  document.getElementById("langSel").addEventListener("change", e => { setLang(e.target.value); location.reload(); });
-</script>
+    <p class="contrast" style="text-align:center;margin-top:1rem;">
+      <a href="privacy.html">Politique de confidentialité</a>
+    </p>
+  </main>
+
+  <!-- Scripts -->
+  <script src="lang.js"></script>
+  <script src="cookies.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const lang = getLang();
+    document.getElementById('langSel').value = lang;
+    document.getElementById('langSel').addEventListener('change', e => { setLang(e.target.value); location.reload(); });
+
+    const t = LANGS[lang];
+    document.getElementById('brand').textContent = t.brand;
+    document.getElementById('lnkConf').textContent = t.conf;
+    document.getElementById('audioLabel').textContent = t.audio_label;
+  </script>
 </body>
 </html>
