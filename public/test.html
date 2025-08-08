@@ -1,23 +1,68 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Questions – Pré-sélection RH</title>
-  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="data:,">
 </head>
-<body>
-  <main class="card">
-    <h1>Questions (10)</h1>
-    <div id="meta"></div>
-    <div id="qwrap"></div>
+<body class="bg-slate-50 text-slate-800">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-indigo-600"></div>
+        <span class="font-semibold">Acme • Questions</span>
+      </div>
+      <div id="idToken" class="text-xs text-slate-500"></div>
+    </div>
+  </header>
 
-    <div class="actions">
-      <button id="submitBtn">Soumettre mes réponses</button>
-      <div id="status"></div>
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <!-- Progress -->
+    <div class="mb-4">
+      <div class="flex items-center justify-between text-sm mb-1">
+        <span id="stepLabel" class="font-medium">Question 1 / 10</span>
+        <span id="timer" class="text-slate-500"></span>
+      </div>
+      <div class="w-full bg-slate-200 rounded-full h-2">
+        <div id="progressBar" class="bg-indigo-600 h-2 rounded-full" style="width:10%"></div>
+      </div>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white shadow-sm ring-1 ring-black/5 rounded-2xl p-6 space-y-4">
+      <h2 id="qTitle" class="text-lg font-semibold"></h2>
+
+      <label class="block">
+        <span class="text-sm font-medium">Réponse écrite</span>
+        <textarea id="textAnswer" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="6" placeholder="Votre réponse ici…"></textarea>
+        <div id="chars" class="text-xs text-slate-500 mt-1">0 caractère</div>
+      </label>
+
+      <div class="space-y-2">
+        <div class="text-sm font-medium">Réponse audio (optionnelle)</div>
+        <div class="flex flex-wrap gap-2">
+          <button id="recBtn" class="bg-slate-900 text-white rounded-xl px-3 py-2">🎙️ Enregistrer</button>
+          <button id="stopBtn" class="bg-slate-200 text-slate-800 rounded-xl px-3 py-2" disabled>⏹ Arrêter</button>
+          <span id="aStatus" class="text-xs text-slate-500 self-center">Aucun audio</span>
+        </div>
+        <audio id="player" controls class="hidden w-full"></audio>
+      </div>
+
+      <div class="flex justify-between pt-2">
+        <button id="prevBtn" class="rounded-xl px-4 py-2 border border-slate-300 text-slate-700 disabled:opacity-40" disabled>← Précédent</button>
+        <button id="nextBtn" class="rounded-xl px-4 py-2 bg-indigo-600 text-white">Suivant →</button>
+      </div>
+      <div id="status" class="text-sm font-semibold text-emerald-600"></div>
     </div>
   </main>
 
+  <footer class="py-8 text-center text-xs text-slate-500">
+    © 2025 Acme. <a class="underline" href="privacy.html">Politique de confidentialité</a>
+  </footer>
+
+  <script src="cookies.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
