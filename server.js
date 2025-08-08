@@ -71,6 +71,25 @@ app.post("/api/submit", upload.any(), (req, res) => {
 // Expose dossiers uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// --- Basic Auth pour /admin ---
+function basicAuth(req, res, next) {
+  const user = process.env.ADMIN_USER || "admin";
+  const pass = process.env.ADMIN_PASS || "changeme";
+
+  const b64auth = (req.headers.authorization || "").split(" ")[1] || "";
+  const [login, pwd] = Buffer.from(b64auth, "base64").toString().split(":");
+
+  if (login === user && pwd === pass) return next();
+
+  res.set("WWW-Authenticate", 'Basic realm="Restricted"');
+  res.status(401).send("Authentication required.");
+}
+
+// Protège /admin
+app.get("/admin", basicAuth, (req, res) => {
+  // ... (garde TON handler actuel tel quel)
+});
+
 // Mini admin
 app.get("/admin", (req, res) => {
   const raw = fs.readFileSync(SUBMISSIONS_JSON, "utf-8");
