@@ -1,55 +1,76 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pré-sélection RH</title>
-  <link rel="stylesheet" href="style.css" />
+  <!-- Design propre en 1 ligne -->
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css">
+  <style>
+    body { min-height: 100dvh; background: radial-gradient(1200px 600px at 20% -10%, #eef2ff 0, transparent 60%),
+                                  radial-gradient(1000px 500px at 120% 10%, #f0f9ff 0, transparent 50%), #f8fafc; }
+    .shell { max-width: 720px; margin: 4rem auto; }
+    header.container { padding-top: 1rem; }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-indigo-50">
+<body>
+  <header class="container">
+    <nav>
+      <ul>
+        <li><strong id="brand">Acme • Recrutement</strong></li>
+      </ul>
+      <ul>
+        <li><a href="privacy.html" id="lnkConf">Confidentialité</a></li>
+        <li>
+          <select id="langSel">
+            <option value="fr">FR</option>
+            <option value="en">EN</option>
+          </select>
+        </li>
+      </ul>
+    </nav>
+  </header>
 
-<header class="flex justify-between items-center p-4 bg-white shadow">
-  <span class="font-semibold">Acme • Recrutement</span>
-  <div class="flex items-center gap-4">
-    <a href="privacy.html" id="lnkConf" class="text-sm text-slate-600 hover:text-slate-900">Confidentialité</a>
-    <select id="langSel" class="text-sm border border-slate-300 rounded-lg px-2 py-1">
-      <option value="fr">FR</option>
-      <option value="en">EN</option>
-    </select>
-  </div>
-</header>
+  <main class="container shell">
+    <article class="card">
+      <header>
+        <h1 id="title">Pré-sélection des candidats</h1>
+        <p id="intro">Ce test comporte <strong>10 questions</strong> à répondre par écrit (et audio en option).</p>
+      </header>
 
-<main class="max-w-xl mx-auto p-6 bg-white rounded-lg shadow mt-10">
-  <h1 class="text-2xl font-bold mb-4">Pré-sélection des candidats</h1>
-  <p class="mb-6">Ce test comporte <b>10 questions</b> à répondre par écrit et audio.</p>
-  <form action="test.html" method="get">
-    <label for="token" class="block mb-2">Identifiant du candidat</label>
-    <input type="text" id="token" name="token" class="border rounded w-full p-2 mb-4" required />
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Commencer le test</button>
-  </form>
-</main>
+      <form action="test.html" method="get">
+        <label for="token" id="lblToken">Identifiant du candidat</label>
+        <input id="token" name="token" placeholder="ex: CAND-1234" required />
+        <footer>
+          <button type="submit" id="btnStart">Commencer le test</button>
+        </footer>
+      </form>
+    </article>
 
-<footer class="text-center mt-8 p-4 text-sm text-slate-500">
-  <a href="privacy.html">Politique de confidentialité</a>
-</footer>
+    <p class="contrast" style="text-align:center;margin-top:1rem;">
+      <a href="privacy.html" id="footConf">Politique de confidentialité</a>
+    </p>
+  </main>
 
-<!-- Scripts -->
-<script src="lang.js"></script>
-<script src="cookies.js"></script>
-<script>
-  // Initialisation langue sur index.html
-  const lang = getLang();
-  document.getElementById("langSel").value = lang;
-  document.getElementById("langSel").addEventListener("change", e => { setLang(e.target.value); location.reload(); });
+  <!-- Scripts -->
+  <script src="lang.js"></script>
+  <script src="cookies.js"></script>
+  <script>
+    const lang = getLang();
+    document.getElementById('langSel').value = lang;
+    document.getElementById('langSel').addEventListener('change', e => { setLang(e.target.value); location.reload(); });
 
-  const t = LANGS[lang];
-  document.title = t.start_title;
-  document.querySelector("header span.font-semibold").textContent = t.brand;
-  document.getElementById("lnkConf").textContent = t.conf;
-  document.querySelector("h1").textContent = t.start_title;
-  document.querySelector("p").innerHTML = t.start_intro;
-  document.querySelector("form button").textContent = t.start_button;
-  document.querySelector("footer a").textContent = t.footer;
-</script>
+    const t = LANGS[lang];
+    document.getElementById('brand').textContent  = t.brand;
+    document.getElementById('lnkConf').textContent = t.conf;
+    document.getElementById('title').textContent   = t.start_title;
+    document.getElementById('intro').innerHTML     = t.start_intro;
+    document.getElementById('btnStart').textContent= t.start_button;
+    document.getElementById('footConf').textContent= t.footer;
+
+    // Préremplir si ?token=...
+    const u = new URL(location.href); const tok = u.searchParams.get('token');
+    if (tok) document.getElementById('token').value = tok;
+  </script>
 </body>
 </html>
