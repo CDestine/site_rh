@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Questions – Pré-sélection RH</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="card">
+    <h1>Questions (10)</h1>
+    <div id="meta"></div>
+    <div id="qwrap"></div>
+
+    <div class="actions">
+      <button id="submitBtn">Soumettre mes réponses</button>
+      <div id="status"></div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
