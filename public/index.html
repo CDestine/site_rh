@@ -4,28 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pré-sélection RH</title>
-  <!-- Design propre en 1 ligne -->
   <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css">
   <style>
-    body { min-height: 100dvh; background: radial-gradient(1200px 600px at 20% -10%, #eef2ff 0, transparent 60%),
-                                  radial-gradient(1000px 500px at 120% 10%, #f0f9ff 0, transparent 50%), #f8fafc; }
+    :root{ --brand:#2563EB; --accent:#10B981; }
+    body { min-height: 100dvh; background:
+      radial-gradient(1200px 600px at 20% -10%, #eef2ff 0, transparent 60%),
+      radial-gradient(1000px 500px at 120% 10%, #f0f9ff 0, transparent 50%), #f8fafc; }
     .shell { max-width: 720px; margin: 4rem auto; }
-    header.container { padding-top: 1rem; }
+    button, [type="submit"] { background:var(--brand)!important; border-color:var(--brand)!important; }
+    .secondary { border-color:var(--brand)!important; color:var(--brand)!important; }
+    a:not(.contrast):not(.secondary){ color:var(--brand); }
   </style>
 </head>
 <body>
   <header class="container">
     <nav>
-      <ul>
-        <li><strong id="brand">Acme • Recrutement</strong></li>
-      </ul>
+      <ul><li><a href="/"><img src="logo.svg" alt="Logo" width="160" height="48" style="vertical-align:middle"></a></li></ul>
       <ul>
         <li><a href="privacy.html" id="lnkConf">Confidentialité</a></li>
         <li>
-          <select id="langSel">
-            <option value="fr">FR</option>
-            <option value="en">EN</option>
-          </select>
+          <select id="langSel"><option value="fr">FR</option><option value="en">EN</option></select>
         </li>
       </ul>
     </nav>
@@ -35,15 +33,13 @@
     <article class="card">
       <header>
         <h1 id="title">Pré-sélection des candidats</h1>
-        <p id="intro">Ce test comporte <strong>10 questions</strong> à répondre par écrit (et audio en option).</p>
+        <p id="intro">Ce test comporte <strong>10 questions</strong> ...</p>
       </header>
 
       <form action="test.html" method="get">
         <label for="token" id="lblToken">Identifiant du candidat</label>
         <input id="token" name="token" placeholder="ex: CAND-1234" required />
-        <footer>
-          <button type="submit" id="btnStart">Commencer le test</button>
-        </footer>
+        <footer><button type="submit" id="btnStart">Commencer le test</button></footer>
       </form>
     </article>
 
@@ -52,23 +48,18 @@
     </p>
   </main>
 
-  <!-- Scripts -->
   <script src="lang.js"></script>
   <script src="cookies.js"></script>
   <script>
-    const lang = getLang();
+    const lang = getLang(); const t = LANGS[lang];
     document.getElementById('langSel').value = lang;
-    document.getElementById('langSel').addEventListener('change', e => { setLang(e.target.value); location.reload(); });
-
-    const t = LANGS[lang];
-    document.getElementById('brand').textContent  = t.brand;
+    document.getElementById('langSel').addEventListener('change', e=>{ setLang(e.target.value); location.reload(); });
+    document.title = t.start_title;
     document.getElementById('lnkConf').textContent = t.conf;
-    document.getElementById('title').textContent   = t.start_title;
-    document.getElementById('intro').innerHTML     = t.start_intro;
-    document.getElementById('btnStart').textContent= t.start_button;
-    document.getElementById('footConf').textContent= t.footer;
-
-    // Préremplir si ?token=...
+    document.getElementById('title').textContent  = t.start_title;
+    document.getElementById('intro').innerHTML    = t.start_intro;
+    document.getElementById('btnStart').textContent = t.start_button;
+    document.getElementById('footConf').textContent = t.footer;
     const u = new URL(location.href); const tok = u.searchParams.get('token');
     if (tok) document.getElementById('token').value = tok;
   </script>
