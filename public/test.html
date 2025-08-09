@@ -1,81 +1,91 @@
-
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Test</title>
-  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root{ --brand:#2563EB; --accent:#10B981; }
-    body { min-height: 100dvh; background:
-      radial-gradient(1200px 600px at 20% -10%, #eef2ff 0, transparent 60%),
-      radial-gradient(1000px 500px at 120% 10%, #f0f9ff 0, transparent 50%), #f8fafc; }
-    .shell { max-width: 840px; margin: 2.5rem auto; }
-    .muted { color: #64748b; }
-    .progress { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-    .progress > div { height: 100%; width: 10%; background: var(--brand); }
-    .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
-    button, [type="submit"] { background:var(--brand)!important; border-color:var(--brand)!important; }
-    .secondary { border-color:var(--brand)!important; color:var(--brand)!important; }
-    a:not(.contrast):not(.secondary){ color:var(--brand); }
+    :root{
+      --bg:#0f1a14; --panel:#121f18; --muted:#9fb0a5; --text:#e9efe9; --accent:#d3c6a3; --cta:#e6d9b5; --cta-text:#1a1a1a;
+    }
+    *{box-sizing:border-box} html,body{margin:0;height:100%}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text); background:var(--bg)}
+    a{color:var(--accent)} .container{max-width:980px; margin:0 auto; padding:0 24px}
+    .brandbar{height:64px; display:flex; align-items:center; background:linear-gradient(180deg, rgba(18,31,24,.9), rgba(18,31,24,.2)); border-bottom:1px solid rgba(255,255,255,.06)}
+    .brand{display:flex; gap:12px; align-items:center} .logo{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#4a7b5b,#a8b98f)}
+    .heroPad{padding:18px 0 8px}
+    .card{margin:28px auto 48px; background:var(--panel); border:1px solid rgba(255,255,255,.06); border-radius:18px; padding:24px; box-shadow:0 30px 60px rgba(0,0,0,.35)}
+    .row{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .muted{color:var(--muted)}
+    .progress{height:10px; background:#213127; border-radius:999px; overflow:hidden}
+    .progress>div{height:100%; width:10%; background:linear-gradient(90deg,#a0b78e,#e6d9b5)}
+    h2{font-family:"Playfair Display",serif; font-weight:600; margin:.2rem 0 1rem}
+    label{display:block; margin:.6rem 0 .3rem; color:#c9d5cd; font-weight:600; letter-spacing:.02em}
+    textarea{width:100%; min-height:140px; resize:vertical; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0d1813; color:var(--text); outline:none}
+    textarea:focus{border-color:#bfcabf}
+    .btn{appearance:none;border:none;cursor:pointer;border-radius:14px;padding:12px 18px;font-weight:600;background:var(--cta);color:var(--cta-text);box-shadow:0 10px 26px rgba(227,210,164,.25)}
+    .btn:active{transform:translateY(1px)} .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,.14)}
+    audio{width:100%}
+    .lang{background:#0d1813; color:var(--text); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:8px 10px}
   </style>
 </head>
 <body>
-  <header class="container">
-    <nav>
-      <ul><li><a href="/"><img src="logo.svg" alt="Logo" width="160" height="48" style="vertical-align:middle"></a></li></ul>
-      <ul>
-        <li><a href="privacy.html" id="lnkConf">Confidentialité</a></li>
-        <li><select id="langSel"><option value="fr">FR</option><option value="en">EN</option></select></li>
-      </ul>
-    </nav>
-  </header>
 
-  <main class="container shell">
-    <article class="card">
-      <header class="row" style="justify-content:space-between">
+  <div class="brandbar">
+    <div class="container row">
+      <div class="brand"><div class="logo"></div><span>Acme • Recrutement</span></div>
+      <div class="row"><a href="privacy.html" id="lnkConf" class="muted">Confidentialité</a>
+        <select id="langSel" class="lang"><option value="fr">FR</option><option value="en">EN</option></select>
+      </div>
+    </div>
+  </div>
+
+  <main class="container heroPad">
+    <section class="card">
+      <header class="row" style="margin-bottom:8px">
         <small id="idToken" class="muted"></small>
-        <small class="muted"><span id="timer">00:00</span></small>
+        <small id="timer" class="muted">00:00</small>
       </header>
 
-      <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+      <div class="progress"><div id="progressBar"></div></div>
       <small id="stepLabel" class="muted">Question 1 / 10</small>
 
-      <h2 id="qTitle" style="margin-top:.5rem">Question</h2>
+      <h2 id="qTitle">Question</h2>
 
-      <label id="lblWritten">Réponse écrite</label>
-      <textarea id="textAnswer" rows="6" placeholder="Votre réponse ici..." maxlength="600"></textarea>
+      <label for="textAnswer">Réponse écrite</label>
+      <textarea id="textAnswer" placeholder="Votre réponse ici..." maxlength="600"></textarea>
       <small id="chars" class="muted">0 / 600 (min 20)</small>
 
       <label id="audioLabel">Réponse audio (optionnelle)</label>
       <div class="row">
-        <button id="recBtn" class="secondary" type="button">🎙️ Enregistrer</button>
-        <button id="stopBtn" class="secondary" type="button" disabled>⏹ Arrêter</button>
+        <button class="btn secondary" id="recBtn" type="button">🎙️ Enregistrer</button>
+        <button class="btn secondary" id="stopBtn" type="button" disabled>⏹ Arrêter</button>
         <small id="aStatus" class="muted">Aucun audio</small>
       </div>
-      <audio id="player" controls style="display:none;width:100%"></audio>
+      <audio id="player" controls style="display:none"></audio>
 
-      <footer class="row" style="justify-content:space-between">
-        <button id="prevBtn" class="secondary" type="button" disabled>← Précédent</button>
-        <button id="nextBtn" type="button">Suivant →</button>
+      <footer class="row" style="margin-top:12px">
+        <button class="btn secondary" id="prevBtn" type="button" disabled>← Précédent</button>
+        <button class="btn" id="nextBtn" type="button">Suivant →</button>
       </footer>
 
       <small id="status" class="muted"></small>
-    </article>
+    </section>
 
-    <p class="contrast" style="text-align:center;margin-top:1rem;">
-      <a href="privacy.html">Politique de confidentialité</a>
-    </p>
+    <footer class="row" style="justify-content:center; margin-bottom:48px">
+      <small class="muted">© 2025 Acme — <a href="privacy.html">Politique de confidentialité</a></small>
+    </footer>
   </main>
 
   <script src="lang.js"></script>
   <script src="cookies.js"></script>
   <script src="app.js"></script>
   <script>
-    const lang = getLang(); document.getElementById('langSel').value = lang;
-    document.getElementById('langSel').addEventListener('change', e=>{ setLang(e.target.value); location.reload(); });
-    const t = LANGS[lang]; document.getElementById('lnkConf').textContent = t.conf;
+    const lang = getLang(); const t = LANGS[lang];
+    document.getElementById('langSel').value = lang;
+    document.getElementById('langSel').addEventListener('change', e => { setLang(e.target.value); location.reload(); });
+    document.getElementById('lnkConf').textContent = t.conf;
     document.getElementById('audioLabel').textContent = t.audio_label;
   </script>
 </body>
