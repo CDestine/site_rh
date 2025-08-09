@@ -1,65 +1,140 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pré-sélection RH</title>
-  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Style "Myhra-like" -->
   <style>
-    :root{ --brand:#2563EB; --accent:#10B981; }
-    body { min-height: 100dvh; background:
-      radial-gradient(1200px 600px at 20% -10%, #eef2ff 0, transparent 60%),
-      radial-gradient(1000px 500px at 120% 10%, #f0f9ff 0, transparent 50%), #f8fafc; }
-    .shell { max-width: 720px; margin: 4rem auto; }
-    button, [type="submit"] { background:var(--brand)!important; border-color:var(--brand)!important; }
-    .secondary { border-color:var(--brand)!important; color:var(--brand)!important; }
-    a:not(.contrast):not(.secondary){ color:var(--brand); }
+    :root{
+      --bg:#0f1a14;          /* vert très foncé */
+      --panel:#121f18;       /* panel profond */
+      --muted:#9fb0a5;       /* gris/vert doux */
+      --text:#e9efe9;        /* texte clair */
+      --accent:#d3c6a3;      /* beige doré */
+      --cta:#e6d9b5;         /* bouton */
+      --cta-text:#1a1a1a;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%}
+    body{
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text); background:var(--bg);
+    }
+    a{color:var(--cta); text-decoration:none}
+    a:hover{opacity:.9}
+    .container{max-width:980px; margin:0 auto; padding:0 24px}
+
+    /* HERO */
+    .hero{
+      position:relative; min-height:58vh; display:grid; place-items:center;
+      background:
+        linear-gradient(0deg, rgba(15,26,20,.55), rgba(15,26,20,.55)),
+        url("https://images.unsplash.com/photo-1520975922284-9bcd8f4fbf32?q=80&w=1600&auto=format&fit=crop"); /* HERO IMAGE */
+      background-size:cover; background-position:center;
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .brandbar{
+      position:absolute; inset:0 0 auto 0; height:64px; display:flex; align-items:center;
+      background:linear-gradient(180deg, rgba(18,31,24,.9), rgba(18,31,24,.2));
+      backdrop-filter: blur(4px);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{width:36px;height:36px; border-radius:10px; background:linear-gradient(135deg,#4a7b5b,#a8b98f)}
+    .brand span{letter-spacing:.08em; font-weight:600; color:#dde6dd}
+    .hero h1{
+      margin:0; font-family:"Playfair Display",serif; font-weight:600; font-size: clamp(28px,5vw,46px);
+      text-align:center; line-height:1.15; color:#f2f5f2;
+    }
+    .hero p{max-width:760px; margin:14px auto 0; text-align:center; color:var(--muted); font-size:18px}
+
+    /* CARD */
+    .card{
+      margin:-48px auto 48px; background:var(--panel); border:1px solid rgba(255,255,255,.06);
+      border-radius:18px; padding:24px; box-shadow:0 30px 60px rgba(0,0,0,.35);
+    }
+    label{display:block; margin:.4rem 0 .25rem; color:#c9d5cd; font-weight:600; letter-spacing:.02em}
+    input{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.12);
+      background:#0d1813; color:var(--text); outline:none; transition: .2s border;
+    }
+    input:focus{border-color:#bfcabf}
+    .row{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:none; cursor:pointer; border-radius:14px;
+      padding:12px 18px; font-weight:600; letter-spacing:.02em;
+      background:var(--cta); color:var(--cta-text);
+      box-shadow: 0 10px 26px rgba(227, 210, 164, .25);
+      transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .btn:hover{opacity:.95; box-shadow:0 14px 36px rgba(227,210,164,.33)}
+    .btn:active{transform:translateY(1px)}
+    .muted{color:var(--muted)}
+    footer small a{color:var(--accent)}
+    .lang{background:#0d1813; color:var(--text); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:8px 10px}
+    @media (max-width:640px){ .row{gap:8px} }
   </style>
 </head>
 <body>
-  <header class="container">
-    <nav>
-      <ul><li><a href="/"><img src="logo.svg" alt="Logo" width="160" height="48" style="vertical-align:middle"></a></li></ul>
-      <ul>
-        <li><a href="privacy.html" id="lnkConf">Confidentialité</a></li>
-        <li>
-          <select id="langSel"><option value="fr">FR</option><option value="en">EN</option></select>
-        </li>
-      </ul>
-    </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="brandbar">
+      <div class="container row">
+        <div class="brand">
+          <div class="logo"></div>
+          <span>Acme • Recrutement</span>
+        </div>
+        <div class="row">
+          <a href="privacy.html" id="lnkConf" class="muted">Confidentialité</a>
+          <select id="langSel" class="lang">
+            <option value="fr">FR</option><option value="en">EN</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1>Une pré-sélection sobre et efficace</h1>
+      <p>10 questions avant un entretien : réponses écrites et audio optionnelles. Sobre, rapide, clair.</p>
+    </div>
   </header>
 
-  <main class="container shell">
-    <article class="card">
-      <header>
-        <h1 id="title">Pré-sélection des candidats</h1>
-        <p id="intro">Ce test comporte <strong>10 questions</strong> ...</p>
-      </header>
-
-      <form action="test.html" method="get">
-        <label for="token" id="lblToken">Identifiant du candidat</label>
-        <input id="token" name="token" placeholder="ex: CAND-1234" required />
-        <footer><button type="submit" id="btnStart">Commencer le test</button></footer>
+  <!-- FORM CARD -->
+  <main class="container">
+    <section class="card">
+      <form action="test.html" method="get" class="col">
+        <label for="token">Identifiant du candidat</label>
+        <input id="token" name="token" placeholder="ex : CAND-1234" required />
+        <div class="row" style="margin-top:12px">
+          <small class="muted">Vos données ne sont utilisées que pour ce recrutement.</small>
+          <button class="btn" type="submit" id="btnStart">Commencer le test</button>
+        </div>
       </form>
-    </article>
-
-    <p class="contrast" style="text-align:center;margin-top:1rem;">
-      <a href="privacy.html" id="footConf">Politique de confidentialité</a>
-    </p>
+    </section>
+    <footer class="row" style="justify-content:center; margin-bottom:48px">
+      <small class="muted">© 2025 Acme — <a href="privacy.html">Politique de confidentialité</a></small>
+    </footer>
   </main>
 
+  <!-- Scripts -->
   <script src="lang.js"></script>
   <script src="cookies.js"></script>
   <script>
+    // i18n
     const lang = getLang(); const t = LANGS[lang];
     document.getElementById('langSel').value = lang;
-    document.getElementById('langSel').addEventListener('change', e=>{ setLang(e.target.value); location.reload(); });
+    document.getElementById('langSel').addEventListener('change', e => { setLang(e.target.value); location.reload(); });
     document.title = t.start_title;
     document.getElementById('lnkConf').textContent = t.conf;
-    document.getElementById('title').textContent  = t.start_title;
-    document.getElementById('intro').innerHTML    = t.start_intro;
     document.getElementById('btnStart').textContent = t.start_button;
-    document.getElementById('footConf').textContent = t.footer;
+
+    // Préremplir si ?token=...
     const u = new URL(location.href); const tok = u.searchParams.get('token');
     if (tok) document.getElementById('token').value = tok;
   </script>
