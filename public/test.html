@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr" data-theme="light">
 <head>
@@ -6,27 +7,27 @@
   <title>Test</title>
   <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css">
   <style>
-    body { min-height: 100dvh; background: radial-gradient(1200px 600px at 20% -10%, #eef2ff 0, transparent 60%),
-                                  radial-gradient(1000px 500px at 120% 10%, #f0f9ff 0, transparent 50%), #f8fafc; }
+    :root{ --brand:#2563EB; --accent:#10B981; }
+    body { min-height: 100dvh; background:
+      radial-gradient(1200px 600px at 20% -10%, #eef2ff 0, transparent 60%),
+      radial-gradient(1000px 500px at 120% 10%, #f0f9ff 0, transparent 50%), #f8fafc; }
     .shell { max-width: 840px; margin: 2.5rem auto; }
     .muted { color: #64748b; }
     .progress { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-    .progress > div { height: 100%; width: 10%; background: #2563eb; }
+    .progress > div { height: 100%; width: 10%; background: var(--brand); }
     .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+    button, [type="submit"] { background:var(--brand)!important; border-color:var(--brand)!important; }
+    .secondary { border-color:var(--brand)!important; color:var(--brand)!important; }
+    a:not(.contrast):not(.secondary){ color:var(--brand); }
   </style>
 </head>
 <body>
   <header class="container">
     <nav>
-      <ul><li><strong id="brand">Acme • Recrutement</strong></li></ul>
+      <ul><li><a href="/"><img src="logo.svg" alt="Logo" width="160" height="48" style="vertical-align:middle"></a></li></ul>
       <ul>
         <li><a href="privacy.html" id="lnkConf">Confidentialité</a></li>
-        <li>
-          <select id="langSel">
-            <option value="fr">FR</option>
-            <option value="en">EN</option>
-          </select>
-        </li>
+        <li><select id="langSel"><option value="fr">FR</option><option value="en">EN</option></select></li>
       </ul>
     </nav>
   </header>
@@ -49,15 +50,15 @@
 
       <label id="audioLabel">Réponse audio (optionnelle)</label>
       <div class="row">
-        <button id="recBtn" class="secondary">🎙️ Enregistrer</button>
-        <button id="stopBtn" class="secondary" disabled>⏹ Arrêter</button>
+        <button id="recBtn" class="secondary" type="button">🎙️ Enregistrer</button>
+        <button id="stopBtn" class="secondary" type="button" disabled>⏹ Arrêter</button>
         <small id="aStatus" class="muted">Aucun audio</small>
       </div>
       <audio id="player" controls style="display:none;width:100%"></audio>
 
       <footer class="row" style="justify-content:space-between">
-        <button id="prevBtn" class="secondary" disabled>← Précédent</button>
-        <button id="nextBtn">Suivant →</button>
+        <button id="prevBtn" class="secondary" type="button" disabled>← Précédent</button>
+        <button id="nextBtn" type="button">Suivant →</button>
       </footer>
 
       <small id="status" class="muted"></small>
@@ -68,18 +69,13 @@
     </p>
   </main>
 
-  <!-- Scripts -->
   <script src="lang.js"></script>
   <script src="cookies.js"></script>
   <script src="app.js"></script>
   <script>
-    const lang = getLang();
-    document.getElementById('langSel').value = lang;
-    document.getElementById('langSel').addEventListener('change', e => { setLang(e.target.value); location.reload(); });
-
-    const t = LANGS[lang];
-    document.getElementById('brand').textContent = t.brand;
-    document.getElementById('lnkConf').textContent = t.conf;
+    const lang = getLang(); document.getElementById('langSel').value = lang;
+    document.getElementById('langSel').addEventListener('change', e=>{ setLang(e.target.value); location.reload(); });
+    const t = LANGS[lang]; document.getElementById('lnkConf').textContent = t.conf;
     document.getElementById('audioLabel').textContent = t.audio_label;
   </script>
 </body>
